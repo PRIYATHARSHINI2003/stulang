@@ -1,0 +1,66 @@
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
+# For example, here's several helpful packages to load
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set_style('darkgrid')
+df = pd.read_csv('../input/stulang/StudentsPerformance.csv')
+df.head()
+df.shape
+df.describe()
+df["mean score"] = ((df["vocab score"] + df["reading score"] + df["writing score"]) / 3).round()
+df.head()
+df['gender'].value_counts()
+from sklearn.preprocessing import LabelEncoder
+lc = LabelEncoder()
+df['gender'] = lc.fit_transform(df['gender'])
+df['race/ethnicity'] = lc.fit_transform(df['race/ethnicity'])
+df['parental level of education'] = lc.fit_transform(df['parental level of education'])
+df['lunch'] = lc.fit_transform(df['lunch'])
+df['test preparation course'] = lc.fit_transform(df['test preparation course'])
+df.head()
+sns.countplot(df['gender'], hue = df['race/ethnicity'])
+df['test preparation course'].value_counts()
+# 1 - None
+# 0 - Completed
+labels = ['None', 'Completed']
+colors = ['red', 'green']
+plt.pie(df['test preparation course'].value_counts() , labels = labels, colors = colors)
+plt.figure(figsize = (12,6))
+sns.barplot(x = 'test preparation course', y = 'mean score', data = df)
+plt.show()
+sns.barplot(x = df['lunch'], y = df['mean score'], palette = 'inferno')
+sns.barplot(x = 'parental level of education', y = 'mean score', data = df)
+plt.figure(figsize = (12,6))
+sns.pairplot(df)
+plt.show()
+plt.figure(figsize = (12,6))
+sns.heatmap(df.corr())
+plt.show()
+df = df.drop(['vocab score', 'writing score', 'reading score'],axis = 1)
+df.head()
+from sklearn.model_selection import train_test_split
+y = df['mean score']
+x = df.drop(['mean score'], axis  = 1)
+x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.2, random_state = 0)
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix
+model = LogisticRegression(solver='liblinear', random_state=0)
+model.fit(x_train, y_train)
+predictions = model.predict(x_test)
+difference.mean()
+difference.mean()
